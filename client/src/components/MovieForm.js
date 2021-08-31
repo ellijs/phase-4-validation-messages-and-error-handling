@@ -13,18 +13,24 @@ function MovieForm() {
     discount: false,
     female_director: false,
   });
+  const [ errors, setErrors ] = useState([]);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    fetch("/movies", {
+    const response = await fetch("/movies", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(formData),
     })
-      .then((response) => response.json())
-      .then((newMovie) => console.log(newMovie));
+     
+      const data = await response.json();
+          if (response.ok) {
+            console.log("Movie created:", data)
+          } else {
+            setErrors(data.errors)
+          }
   }
 
   function handleChange(e) {
@@ -37,7 +43,15 @@ function MovieForm() {
   }
 
   return (
+    
     <Wrapper>
+      { errors.length > 0 && (
+        <ul style={{ color: "red" }}>
+        {errors.map((error) => (
+          <li key={error}>{error}</li>
+        ))}
+      </ul>
+      )}
       <form onSubmit={handleSubmit}>
         <FormGroup>
           <label htmlFor="title">Title</label>
